@@ -1,3 +1,5 @@
-import 'bootstrap/dist/css/bootstrap-grid.css';
-import 'bootstrap/js/dist/util';
-import 'bootstrap/js/dist/alert';
+import 'bootstrap';
+import 'bootstrap/dist/css/bootstrap.css';
+import app from './app';
+
+app();

@@ -21,15 +21,19 @@
   },
   "dependencies": {
     "@babel/polyfill": "^7.2.5",
+    "axios": "^0.19.2",
     "bootstrap": "^4.4.1",
     "jquery": "^3.4.1",
-    "popper.js": "^1.16.1"
+    "melanke-watchjs": "^1.5.2",
+    "popper.js": "^1.16.1",
+    "yup": "^0.28.1",
+    "lodash": "^4.17.15"
   },
   "devDependencies": {
     "@babel/core": "^7.1.6",
     "@babel/preset-env": "^7.1.6",
     "babel-core": "^7.0.0-bridge.0",
-    "babel-eslint": "^10.0.1",
+    "babel-eslint": "^10.0.2",
     "babel-jest": "^24.0.0",
     "babel-loader": "^8.0.5",
     "css-loader": "3.3.0",
