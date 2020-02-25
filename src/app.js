@@ -15,7 +15,7 @@ const getPosts = (data, id) => {
   const listPosts = [...items].map((item) => {
     const name = item.querySelector('title').textContent;
     const description = item.querySelector('description').textContent;
-    const link = item.querySelector('link').nextSibling.data;
+    const link = item.querySelector('link').textContent;
     const post = {
       name, description, link, id,
     };
@@ -33,10 +33,9 @@ const getFeed = (data, url, id) => {
 };
 
 const requestOnUrl = async (url) => {
-  const proxy = proxyServer.path;
-  const response = await axios.get(`${proxy}/${url}`);
+  const response = await axios.get(`${proxyServer.path}/${url}`);
   const parser = new DOMParser();
-  const xmlData = parser.parseFromString(response.data, 'text/html');
+  const xmlData = parser.parseFromString(response.data, 'text/xml');
   return xmlData;
 };
 
@@ -63,6 +62,7 @@ export default async () => {
       processForm: i18next.t('processForm.initial'),
       valid: false,
       inputData: null,
+      errors: null,
     },
     data: {
       feeds: [],
@@ -88,7 +88,10 @@ export default async () => {
       const btn = document.createElement('button');
       btn.setAttribute('type', 'button');
       btn.setAttribute('id', feed.id);
-      btn.classList.add('btn', 'btn-outline-dark');
+      btn.classList.add('btn', 'btn-light', 'border');
+      if (feed.status === 'active') {
+        btn.classList.add('active');
+      }
       btn.textContent = `${feed.name}`;
       btn.addEventListener('click', hundlerClick);
       listFeeds.appendChild(btn);
@@ -105,13 +108,17 @@ export default async () => {
     } else {
       state.form.processForm = i18next.t('processForm.filling');
       state.form.inputData = target.value;
-      state.form.valid = await validation(state);
+      const valid = await validation(state);
+      const error = (valid) ? null : i18next.t('errors.valid');
+      state.form.valid = valid;
+      state.form.errors = error;
     }
   });
 
   const initState = () => {
     state.form.processForm = i18next.t('processForm.initial');
     state.form.valid = false;
+    state.form.errors = null;
   };
 
   const form = document.querySelector('form');
@@ -120,7 +127,6 @@ export default async () => {
     e.preventDefault();
     const { inputData } = state.form;
     state.form.processForm = i18next.t('processForm.sending');
-    console.log(state, 'stateOnSubmit');
     try {
       const xmlData = await requestOnUrl(inputData);
       const id = _.uniqueId();
@@ -133,7 +139,7 @@ export default async () => {
       setTimeout(() => initState(), 0);
     } catch (error) {
       state.form.processForm = i18next.t('processForm.filling');
-      console.log('errorREQUEST');
+      state.form.errors = i18next.t('errors.network');
       throw error;
     }
   });
@@ -165,12 +171,18 @@ export default async () => {
     if (state.form.valid === true) {
       input.classList.remove('is-invalid');
       submitButton.disabled = !state.form.valid;
-    } else if (state.form.valid === false && state.form.processForm === 'initial') {
+    } else if (state.form.valid === false && state.form.processForm === i18next.t('processForm.initial')) {
       input.classList.remove('is-invalid');
       submitButton.disabled = !state.form.valid;
     } else {
       input.classList.add('is-invalid');
     }
+  });
+
+  watch(state.form, 'errors', () => {
+    const feedbackElement = document.querySelector('div.invalid-feedback');
+    feedbackElement.innerHTML = '';
+    feedbackElement.textContent = state.form.errors;
   });
 
   const renderPosts = (posts) => {
@@ -205,11 +217,12 @@ export default async () => {
   const createHeaderPosts = (feed) => {
     const container = document.querySelector('[name="head"');
     container.innerHTML = '';
+    const hr = document.createElement('hr');
     const p = document.createElement('p');
     const h5 = document.createElement('h5');
     h5.textContent = feed.name;
     p.textContent = feed.description;
-    container.append(h5, p);
+    container.append(hr, h5, p);
   };
 
   watch(state.feed, 'currentFeed', () => {
@@ -232,6 +245,10 @@ export default async () => {
     }
   });
 
+  const initStatus = () => {
+    state.feed.currentFeed.status = i18next.t('statusFeed.actual');
+  };
+
   setTimeout(async function updatePost() {
     const { currentFeed } = state.feed;
     const { feeds, posts } = state.data;
@@ -247,9 +264,7 @@ export default async () => {
         state.data.posts = [...diffPosts, ...posts];
       } if (currentFeed && currentFeed.id === feed.id) {
         currentFeed.status = i18next.t('statusFeed.updated');
-        setTimeout(() => function initStatus() {
-          currentFeed.status = i18next.t('statusFeed.actual');
-        }, 0);
+        setTimeout(() => initStatus(), 0);
       } if (currentFeed && diffPosts === []) {
         currentFeed.status = i18next.t('statusFeed.actual');
       }

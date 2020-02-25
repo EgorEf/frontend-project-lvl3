@@ -7,25 +7,24 @@
   </head>
   <body>
     <div class="jumbotron">
-      <h1 class="display-5">RSS-feeds</h1>
-      <p class="lead">Это простой пример блока с компонентом в стиле jumbotron для привлечения дополнительного внимания к содержанию или информации.</p>
+      <h1 class="display-5">RSS-reader</h1>
       <hr class="my-4">
-      <p>Использются служебные классы для типографики и расстояния содержимого в контейнере большего размера.</p>
+      <p class="lead">Это простой пример блока с компонентом в стиле jumbotron для привлечения дополнительного внимания к содержанию или информации.</p>
       <p class="lead">
         <form> 
           <div class="form-row">
-            <div class="col-10">
+            <div class="col-9">
               <div class="form-group">
-                <input class="form-control form-control-md" type="text" placeholder="Enter your text">
-                <div class="invalid-feedback">
-                  Please provide a valid URL adress.
-                </div>
+                <input class="form-control form-control-md" type="text" placeholder="Enter a website or feed URL">
+                <div class="invalid-feedback"></div>
               </div>
             </div>
-            <button type="submit" class="btn btn-primary mb-4" disabled="">Add feed</button>
+              <div class="col-3">
+                <button type="submit" class="btn btn-primary mb-4" disabled="">Add feed</button>
+              </div>
           </div>
         </form>
-     </p>
+      </p>
     </div>
     <div class="container">
       <div class="row">
