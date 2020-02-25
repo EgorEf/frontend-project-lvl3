@@ -73,32 +73,6 @@ export default async () => {
     },
   };
 
-  const hundlerClick = ({ target }) => {
-    const currentId = target.id;
-    const { name, description } = state.data.feeds.find(({ id }) => id === currentId);
-    state.feed.currentFeed = {
-      name, description, id: currentId, status: i18next.t('statusFeed.init'),
-    };
-  };
-
-  const renderFeeds = (feeds) => {
-    const listFeeds = document.querySelector('[name="Feeds"]');
-    listFeeds.innerHTML = '';
-    feeds.map((feed) => {
-      const btn = document.createElement('button');
-      btn.setAttribute('type', 'button');
-      btn.setAttribute('id', feed.id);
-      btn.classList.add('btn', 'btn-light', 'border');
-      if (feed.status === 'active') {
-        btn.classList.add('active');
-      }
-      btn.textContent = `${feed.name}`;
-      btn.addEventListener('click', hundlerClick);
-      listFeeds.appendChild(btn);
-      return listFeeds;
-    });
-  };
-
   const submitButton = document.querySelector('button[type="submit"]');
   const input = document.querySelector('input.form-control');
 
@@ -143,6 +117,24 @@ export default async () => {
       throw error;
     }
   });
+
+  const renderFeeds = (feeds) => {
+    const listFeeds = document.querySelector('[name="Feeds"]');
+    listFeeds.innerHTML = '';
+    feeds.map((feed) => {
+      const btn = document.createElement('button');
+      btn.setAttribute('type', 'button');
+      btn.setAttribute('id', feed.id);
+      btn.classList.add('btn', 'btn-light', 'border');
+      if (feed.status === 'active') {
+        btn.classList.add('active');
+      }
+      btn.textContent = `${feed.name}`;
+      btn.addEventListener('click', hundlerClick);
+      listFeeds.appendChild(btn);
+      return listFeeds;
+    });
+  };
 
   watch(state.form, 'processForm', () => {
     const { processForm } = state.form;
@@ -205,6 +197,13 @@ export default async () => {
       return container;
     });
   };
+  const hundlerClick = ({ target }) => {
+    const currentId = target.id;
+    const { name, description } = state.data.feeds.find(({ id }) => id === currentId);
+    state.feed.currentFeed = {
+      name, description, id: currentId, status: i18next.t('statusFeed.init'),
+    };
+  };
 
   const activationButton = (feed) => {
     const oldActiveEl = document.querySelector('button.active');
@@ -214,6 +213,7 @@ export default async () => {
     const newActiveEl = document.querySelector(`button[id="${feed.id}"]`);
     newActiveEl.classList.add('active');
   };
+  
   const createHeaderPosts = (feed) => {
     const container = document.querySelector('[name="head"');
     container.innerHTML = '';
