@@ -3,6 +3,12 @@ import { watch } from 'melanke-watchjs';
 import axios from 'axios';
 import { string } from 'yup';
 import _ from 'lodash';
+import i18next from 'i18next';
+import resources from './locales';
+
+const proxyServer = {
+  path: 'https://cors-anywhere.herokuapp.com',
+};
 
 const getPosts = (data, id) => {
   const items = data.querySelectorAll('item');
@@ -27,7 +33,7 @@ const getFeed = (data, url, id) => {
 };
 
 const requestOnUrl = async (url) => {
-  const proxy = 'https://cors-anywhere.herokuapp.com';
+  const proxy = proxyServer.path;
   const response = await axios.get(`${proxy}/${url}`);
   const parser = new DOMParser();
   const xmlData = parser.parseFromString(response.data, 'text/html');
@@ -45,10 +51,16 @@ const validation = async (state) => {
   const toBeRss = inputData.includes('rss');
   return validUrl && uniqUrl && toBeRss;
 };
-export default () => {
+export default async () => {
+  await i18next.init({
+    lng: 'en',
+    debug: true,
+    resources,
+  });
+
   const state = {
     form: {
-      processForm: 'initial',
+      processForm: i18next.t('processForm.initial'),
       valid: false,
       inputData: null,
     },
@@ -61,12 +73,11 @@ export default () => {
     },
   };
 
-
   const hundlerClick = ({ target }) => {
     const currentId = target.id;
     const { name, description } = state.data.feeds.find(({ id }) => id === currentId);
     state.feed.currentFeed = {
-      name, description, id: currentId, status: 'init',
+      name, description, id: currentId, status: i18next.t('statusFeed.init'),
     };
   };
 
@@ -90,16 +101,16 @@ export default () => {
 
   input.addEventListener('input', async ({ target }) => {
     if (target.value === '') {
-      state.form.processForm = 'initial';
+      state.form.processForm = i18next.t('processForm.initial');
     } else {
-      state.form.processForm = 'filling';
+      state.form.processForm = i18next.t('processForm.filling');
       state.form.inputData = target.value;
       state.form.valid = await validation(state);
     }
   });
 
   const initState = () => {
-    state.form.processForm = 'initial';
+    state.form.processForm = i18next.t('processForm.initial');
     state.form.valid = false;
   };
 
@@ -108,20 +119,20 @@ export default () => {
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
     const { inputData } = state.form;
-    state.form.processForm = 'sending';
+    state.form.processForm = i18next.t('processForm.sending');
     console.log(state, 'stateOnSubmit');
     try {
       const xmlData = await requestOnUrl(inputData);
       const id = _.uniqueId();
       const feed = getFeed(xmlData, inputData, id);
       const posts = getPosts(xmlData, id);
-      state.form.processForm = 'added';
+      state.form.processForm = i18next.t('processForm.added');
       state.form.inputData = '';
       state.data.feeds.push(feed);
       posts.forEach((post) => state.data.posts.push(post));
       setTimeout(() => initState(), 0);
     } catch (error) {
-      state.form.processForm = 'filling';
+      state.form.processForm = i18next.t('processForm.filling');
       console.log('errorREQUEST');
       throw error;
     }
@@ -130,18 +141,18 @@ export default () => {
   watch(state.form, 'processForm', () => {
     const { processForm } = state.form;
     switch (processForm) {
-      case 'initial':
+      case i18next.t('processForm.initial'):
         input.classList.remove('is-invalid');
         submitButton.disabled = true;
         break;
-      case 'filling':
+      case i18next.t('processForm.filling'):
         submitButton.disabled = true;
         input.classList.add('is-invalid');
         break;
-      case 'sending':
+      case i18next.t('processForm.sending'):
         submitButton.disabled = true;
         break;
-      case 'added':
+      case i18next.t('processForm.added'):
         renderFeeds(state.data.feeds);
         input.value = '';
         break;
@@ -206,14 +217,14 @@ export default () => {
     const feed = state.feed.currentFeed;
     const currentPosts = state.data.posts.filter(({ id }) => id === feed.id);
     switch (status) {
-      case 'init':
+      case i18next.t('statusFeed.init'):
         activationButton(feed);
         createHeaderPosts(feed);
         renderPosts(currentPosts);
         break;
-      case 'actual':
+      case i18next.t('statusFeed.actual'):
         break;
-      case 'updated':
+      case i18next.t('statusFeed.updated'):
         renderPosts(currentPosts);
         break;
       default:
@@ -235,12 +246,12 @@ export default () => {
       if (diffPosts !== []) {
         state.data.posts = [...diffPosts, ...posts];
       } if (currentFeed && currentFeed.id === feed.id) {
-        currentFeed.status = 'updated';
+        currentFeed.status = i18next.t('statusFeed.updated');
         setTimeout(() => function initStatus() {
-          currentFeed.status = 'actual';
+          currentFeed.status = i18next.t('statusFeed.actual');
         }, 0);
       } if (currentFeed && diffPosts === []) {
-        currentFeed.status = 'actual';
+        currentFeed.status = i18next.t('statusFeed.actual');
       }
     });
     setTimeout(updatePost, 10000);
