@@ -2,4 +2,4 @@
 
 [![Maintainability](https://api.codeclimate.com/v1/badges/6449014b730b8b42a2a0/maintainability)](https://codeclimate.com/github/EgorEf/frontend-project-lvl3/maintainability)
 
-https://frontend-project-lvl3-2.now.sh/?
+https://rss-project-lvl3-gy4x6ygo6.now.sh/
