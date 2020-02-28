@@ -3,9 +3,12 @@ import _ from 'lodash';
 export const getPosts = (data, id) => {
   const items = data.querySelectorAll('item');
   const listPosts = [...items].map((item) => {
-    const name = item.querySelector('title').textContent;
-    const description = item.querySelector('description').textContent;
-    const link = item.querySelector('link').textContent;
+    const titleElement = item.querySelector('title');
+    const descriptionElement = item.querySelector('description');
+    const linkElement = item.querySelector('link');
+    const name = titleElement.textContent;
+    const description = descriptionElement.textContent;
+    const link = linkElement.textContent;
     const post = {
       name, description, link, id,
     };
@@ -15,8 +18,10 @@ export const getPosts = (data, id) => {
 };
 
 const getFeed = (data, url, id) => {
-  const name = data.querySelector('channel > title').textContent;
-  const description = data.querySelector('channel > description').textContent;
+  const titleElement = data.querySelector('channel > title');
+  const name = titleElement.textContent;
+  const descriptionElement = data.querySelector('channel > description');
+  const description = descriptionElement.textContent;
   const feed = {
     name, description, url, id,
   };

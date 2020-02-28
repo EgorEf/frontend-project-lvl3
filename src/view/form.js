@@ -2,7 +2,8 @@ import i18next from 'i18next';
 
 const hundlerClick = (state) => ({ target }) => {
   const currentId = target.id;
-  const { name, description } = state.data.feeds.find(({ id }) => id === currentId);
+  const feed = state.data.feeds.find(({ id }) => id === currentId);
+  const { name, description } = feed;
   state.feed.currentFeed = {
     name, description, id: currentId, status: i18next.t('statusFeed.init'),
   };
@@ -44,6 +45,6 @@ export default (state, input) => {
       input.value = '';
       break;
     default:
-      console.log('boom');
+      throw new Error(`Unknown order state: '${processForm}'!`);
   }
 };

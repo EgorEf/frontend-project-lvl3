@@ -43,8 +43,9 @@ const activationButton = (feed) => {
 
 export default (state) => {
   const { status } = state.feed.currentFeed;
+  const { posts } = state.data;
   const feed = state.feed.currentFeed;
-  const currentPosts = state.data.posts.filter(({ id }) => id === feed.id);
+  const currentPosts = posts.filter(({ id }) => id === feed.id);
   switch (status) {
     case i18next.t('statusFeed.init'):
       activationButton(feed);
@@ -57,6 +58,6 @@ export default (state) => {
       renderPosts(currentPosts);
       break;
     default:
-      console.log('err');
+      throw new Error(`Unknown order state: '${status}'!`);
   }
 };
