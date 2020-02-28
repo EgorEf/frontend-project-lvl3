@@ -5,4 +5,4 @@
 This is training project: RSS-reader. Implemented the ability to add / switch feeds, view all publications of each feed. 
 Automatic update of all feeds (default interval: 5 sec).
 
-https://rss-project-lvl3-gy4x6ygo6.now.sh/
+https://rss-project-lvl3.gor55.now.sh
