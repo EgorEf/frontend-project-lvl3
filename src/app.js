@@ -117,7 +117,7 @@ export default () => {
         .then((xmlData) => {
           const oldPosts = posts.filter((post) => post.id === feed.id).slice(0, 50);
           const actualPosts = getPosts(xmlData, feed.id).slice(0, 50);
-          const diffPosts = _.differenceWith(actualPosts, oldPosts, _.isEqual).reverse();
+          const diffPosts = _.differenceWith(actualPosts, oldPosts, _.isEqual);
           if (diffPosts !== []) {
             diffPosts.map((post) => state.data.posts.unshift(post));
           } if (currentFeed && currentFeed.id === feed.id) {
