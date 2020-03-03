@@ -1,5 +1,3 @@
-import i18next from 'i18next';
-
 const renderPosts = (posts) => {
   const container = document.querySelector('[name="Publications"');
   container.innerHTML = '';
@@ -47,17 +45,17 @@ export default (state) => {
   const feed = state.feed.currentFeed;
   const currentPosts = posts.filter(({ id }) => id === feed.id);
   switch (status) {
-    case i18next.t('statusFeed.init'):
+    case 'init':
       activationButton(feed);
       createHeaderPosts(feed);
       renderPosts(currentPosts);
       break;
-    case i18next.t('statusFeed.actual'):
+    case 'actual':
       break;
-    case i18next.t('statusFeed.updated'):
+    case 'updated':
       renderPosts(currentPosts);
       break;
     default:
-      throw new Error(`Unknown order state: '${status}'!`);
+      throw new Error(`Unknown status state: '${status}'!`);
   }
 };

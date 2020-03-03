@@ -1,4 +1,3 @@
-import _ from 'lodash';
 
 export const getPosts = (data, id) => {
   const items = data.querySelectorAll('item');
@@ -28,8 +27,9 @@ const getFeed = (data, url, id) => {
   return feed;
 };
 
-export const parseXml = (xmlData, url) => {
-  const id = _.uniqueId();
+export default (data, url, id) => {
+  const parser = new DOMParser();
+  const xmlData = parser.parseFromString(data, 'text/xml');
   const feed = getFeed(xmlData, url, id);
   const posts = getPosts(xmlData, id);
   return { feed, posts };

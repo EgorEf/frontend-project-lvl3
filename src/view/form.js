@@ -1,11 +1,12 @@
-import i18next from 'i18next';
-
+/* eslint no-param-reassign: ["error", { "ignorePropertyModificationsFor": ["state", "input"] }] */
+/* eslint arrow-parens: ["error", "always"] */
+/* eslint-env es6 */
 const hundlerClick = (state) => ({ target }) => {
   const currentId = target.id;
   const feed = state.data.feeds.find(({ id }) => id === currentId);
   const { name, description } = feed;
   state.feed.currentFeed = {
-    name, description, id: currentId, status: i18next.t('statusFeed.init'),
+    name, description, id: currentId, status: 'init',
   };
 };
 
@@ -29,22 +30,22 @@ export default (state, input) => {
   const submitButton = document.querySelector('button[type="submit"]');
   const { processForm } = state.form;
   switch (processForm) {
-    case i18next.t('processForm.initial'):
+    case 'initial':
       input.classList.remove('is-invalid');
       submitButton.disabled = true;
       break;
-    case i18next.t('processForm.filling'):
+    case 'filling':
       submitButton.disabled = true;
       input.classList.add('is-invalid');
       break;
-    case i18next.t('processForm.sending'):
+    case 'sending':
       submitButton.disabled = true;
       break;
-    case i18next.t('processForm.added'):
+    case 'added':
       renderFeeds(state);
       input.value = '';
       break;
     default:
-      throw new Error(`Unknown order state: '${processForm}'!`);
+      throw new Error(`Unknown process state: '${processForm}'!`);
   }
 };
