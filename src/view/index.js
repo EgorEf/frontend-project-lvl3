@@ -1,4 +1,4 @@
-import renderError from './error';
+import renderError from './errorStatus';
 import renderValid from './valid';
 import renderCurrentFeed from './currentFeed';
 import renderForm from './form';

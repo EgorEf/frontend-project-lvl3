@@ -1,5 +1,3 @@
-/* eslint arrow-parens: ["error", "always"] */
-/* eslint-env es6 */
 import '@babel/polyfill';
 import { watch } from 'melanke-watchjs';
 import axios from 'axios';
@@ -38,7 +36,7 @@ export default () => {
       processForm: 'initial',
       valid: false,
       inputData: null,
-      errors: 'nothing',
+      errorStatus: 'nothing',
     },
     data: {
       feeds: [],
@@ -62,7 +60,7 @@ export default () => {
         .then((valid) => {
           const typeError = (valid) ? 'nothing' : 'invalid';
           state.form.valid = valid;
-          state.form.errors = typeError;
+          state.form.errorStatus = typeError;
         });
     }
   });
@@ -70,7 +68,7 @@ export default () => {
   const resetFormState = () => {
     state.form.processForm = 'initial';
     state.form.valid = false;
-    state.form.errors = 'nothing';
+    state.form.errorStatus = 'nothing';
   };
 
   form.addEventListener('submit', (e) => {
@@ -90,21 +88,21 @@ export default () => {
         state.data.feeds.push(feed);
         posts.forEach((post) => state.data.posts.push(post));
       })
-      .then(resetFormState())
       .catch((error) => {
         state.form.valid = false;
         state.form.processForm = 'filling';
-        state.form.errors = 'not-found';
+        state.form.errorStatus = 'not-found';
         throw error;
       });
+    resetFormState();
   });
 
   watch(state.form, 'processForm', () => renderForm(state, input));
   watch(state.form, 'valid', () => renderValid(state, input));
-  watch(state.form, 'errors', () => renderError(state));
+  watch(state.form, 'errorStatus', () => renderError(state));
   watch(state.feed, 'currentFeed', () => renderCurrentFeed(state));
 
-  const initStatus = () => {
+  const initUpdateStatus = () => {
     const { currentFeed } = state.feed;
     if (currentFeed) {
       state.feed.currentFeed.status = 'actual';
@@ -129,13 +127,13 @@ export default () => {
             currentFeed.status = 'updated';
           }
         })
-        .then(initStatus())
         .catch((error) => {
           state.form.valid = false;
           state.form.processForm = 'filling';
-          state.form.errors = 'network';
+          state.form.errorStatus = 'network';
           throw error;
         });
+      initUpdateStatus();
     });
     setTimeout(updatePosts, updateInterval);
   };

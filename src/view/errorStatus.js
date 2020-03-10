@@ -1,10 +1,10 @@
 import i18next from 'i18next';
 
 export default (state) => {
-  const { errors } = state.form;
+  const { errorStatus } = state.form;
   const feedbackElement = document.querySelector('div.invalid-feedback');
   feedbackElement.innerHTML = '';
-  switch (errors) {
+  switch (errorStatus) {
     case 'nothing':
       break;
     case 'invalid':
@@ -17,6 +17,6 @@ export default (state) => {
       feedbackElement.textContent = i18next.t('errors.network');
       break;
     default:
-      throw new Error(`Unknown errors state: '${errors}'!`);
+      throw new Error(`Unknown errorStatus state: '${errorStatus}'!`);
   }
 };

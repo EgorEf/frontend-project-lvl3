@@ -28,6 +28,7 @@ const createHeaderPosts = (feed) => {
   h5.textContent = feed.name;
   p.textContent = feed.description;
   container.append(hr, h5, p);
+  container.classList.add('border', 'border-secondary', 'rounded-lg', 'pl-3', 'pb-3');
 };
 
 const activationButton = (feed) => {

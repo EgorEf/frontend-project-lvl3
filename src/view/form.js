@@ -1,6 +1,4 @@
 /* eslint no-param-reassign: ["error", { "ignorePropertyModificationsFor": ["state", "input"] }] */
-/* eslint arrow-parens: ["error", "always"] */
-/* eslint-env es6 */
 const hundlerClick = (state) => ({ target }) => {
   const currentId = target.id;
   const feed = state.data.feeds.find(({ id }) => id === currentId);

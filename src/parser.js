@@ -1,4 +1,3 @@
-
 export const getPosts = (data, id) => {
   const items = data.querySelectorAll('item');
   const listPosts = [...items].map((item) => {
