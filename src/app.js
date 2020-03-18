@@ -1,10 +1,9 @@
-import '@babel/polyfill';
 import { watch } from 'melanke-watchjs';
 import axios from 'axios';
 import _ from 'lodash';
 import i18next from 'i18next';
 import resources from './locales';
-import parsingRss from './parser';
+import parse from './parser';
 import validation from './validator';
 import {
   renderError, renderValid, renderCurrentFeed, renderForm,
@@ -16,13 +15,16 @@ const proxyServer = {
 };
 const getUrl = (inputData) => `${proxyServer.path}/${inputData}`;
 
-const requestOnUrl = (inputData) => {
-  const url = `${proxyServer.path}/${inputData}`;
-  const response = axios.get(url);
-  return response;
-};
-
 const getDiffPosts = (actualPosts, oldPosts) => _.differenceWith(actualPosts, oldPosts, _.isEqual);
+
+const getPreparedData = (data, id, url) => {
+  const { head, items } = data;
+  const propertyForFeed = { id, url };
+  const propertyForPosts = { id };
+  const feed = { ...head, ...propertyForFeed };
+  const posts = items.map((item) => ({ ...item, ...propertyForPosts }));
+  return { feed, posts };
+};
 
 export default () => {
   i18next.init({
@@ -36,6 +38,7 @@ export default () => {
       processForm: 'initial',
       valid: false,
       inputData: null,
+      addedLinks: [],
       errorStatus: 'nothing',
     },
     data: {
@@ -56,7 +59,7 @@ export default () => {
     } else {
       state.form.processForm = 'filling';
       state.form.inputData = target.value;
-      validation(state)
+      validation(state.form)
         .then((valid) => {
           const typeError = (valid) ? 'nothing' : 'invalid';
           state.form.valid = valid;
@@ -75,11 +78,13 @@ export default () => {
     e.preventDefault();
     const { inputData } = state.form;
     state.form.processForm = 'sending';
-    const id = _.uniqueId();
     const url = getUrl(inputData);
+    const id = _.uniqueId();
     axios.get(url)
       .then((response) => {
-        const { feed, posts } = parsingRss(response.data, url, id);
+        const data = parse(response.data);
+        const { feed, posts } = getPreparedData(data, id, url);
+        state.form.addedLinks.push(inputData);
         state.form.processForm = 'added';
         state.form.inputData = '';
         if (state.feed.currentFeed) {
@@ -117,9 +122,12 @@ export default () => {
     }
     feeds.forEach((feed) => {
       const oldPosts = posts.filter((post) => post.id === feed.id);
-      requestOnUrl(feed.url)
-        .then((response) => parsingRss(response.data, feed.url, feed.id))
-        .then((data) => getDiffPosts(data.posts, oldPosts))
+      axios.get(feed.url)
+        .then((response) => {
+          const data = parse(response.data);
+          return getPreparedData(data, feed.id);
+        })
+        .then((preparedData) => getDiffPosts(preparedData.posts, oldPosts))
         .then((diffPosts) => {
           if (diffPosts !== []) {
             diffPosts.forEach((post) => state.data.posts.unshift(post));

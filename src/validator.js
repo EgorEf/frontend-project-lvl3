@@ -1,16 +1,15 @@
-import { string } from 'yup';
+import { string, mixed } from 'yup';
 
 export default ((state) => {
-  const { form, data } = state;
-  const { inputData } = form;
-  const { feeds } = data;
+  const { inputData, addedLinks } = state;
   const schema = string().url();
-  const valid = schema.isValid(inputData)
-    .then((validUrl) => {
-      const listUrls = feeds.map(({ url }) => url);
-      const uniqUrl = !(listUrls.includes(inputData));
-      const toBeRss = inputData.includes('rss');
-      return validUrl && uniqUrl && toBeRss;
-    });
-  return valid;
+  const validUrl = schema.isValid(inputData)
+    .then((response) => response);
+  const schemaArray = mixed().notOneOf(addedLinks);
+  const isUniqueUrl = schemaArray.isValid(inputData)
+    .then((response) => response);
+  const schemaMatch = string().matches(/rss/);
+  const toBeRss = schemaMatch.isValid(inputData)
+    .then((response) => response);
+  return validUrl && isUniqueUrl && toBeRss;
 });
