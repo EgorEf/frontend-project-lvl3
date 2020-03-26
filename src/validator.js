@@ -1,15 +1,11 @@
-import { string, mixed } from 'yup';
+import { string, mixed, object } from 'yup';
 
-export default ((state) => {
-  const { inputData, addedLinks } = state;
-  const schema = string().url();
-  const validUrl = schema.isValid(inputData)
-    .then((response) => response);
-  const schemaArray = mixed().notOneOf(addedLinks);
-  const isUniqueUrl = schemaArray.isValid(inputData)
-    .then((response) => response);
-  const schemaMatch = string().matches(/rss/);
-  const toBeRss = schemaMatch.isValid(inputData)
-    .then((response) => response);
-  return validUrl && isUniqueUrl && toBeRss;
-});
+export default (form) => {
+  const { inputData, addedLinks } = form;
+  const schema = object().shape({
+    checkUrl: string().url().matches(/rss/),
+    checkAddedUrls: mixed().notOneOf(addedLinks),
+  });
+  const validUrl = schema.isValid({ checkUrl: inputData, checkAddedUrls: inputData });
+  return validUrl;
+};
