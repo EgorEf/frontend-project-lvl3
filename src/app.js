@@ -17,15 +17,6 @@ const getUrl = (inputData) => `${proxyServer.path}/${inputData}`;
 
 const getDiffPosts = (actualPosts, oldPosts) => _.differenceWith(actualPosts, oldPosts, _.isEqual);
 
-const getPreparedData = (data, id, url) => {
-  const { head, items } = data;
-  const propertyForFeed = { id, url };
-  const propertyForPosts = { id };
-  const feed = { ...head, ...propertyForFeed };
-  const posts = items.map((item) => ({ ...item, ...propertyForPosts }));
-  return { feed, posts };
-};
-
 export default () => {
   i18next.init({
     lng: 'en',
@@ -38,7 +29,6 @@ export default () => {
       processForm: 'initial',
       valid: false,
       inputData: null,
-      addedLinks: [],
       errorStatus: 'nothing',
     },
     data: {
@@ -59,7 +49,8 @@ export default () => {
     } else {
       state.form.processForm = 'filling';
       state.form.inputData = target.value;
-      validation(state.form)
+      const { form: { inputData }, data: { feeds } } = state;
+      validation(feeds, inputData)
         .then((valid) => {
           const typeError = (valid) ? 'nothing' : 'invalid';
           state.form.valid = valid;
@@ -82,16 +73,14 @@ export default () => {
     const id = _.uniqueId();
     axios.get(url)
       .then((response) => {
-        const data = parse(response.data);
-        const { feed, posts } = getPreparedData(data, id, url);
-        state.form.addedLinks.push(inputData);
+        const { feed, posts } = parse(response.data);
         state.form.processForm = 'added';
         state.form.inputData = '';
         if (state.feed.currentFeed) {
           state.feed.currentFeed.status = 'init';
         }
-        state.data.feeds.push(feed);
-        posts.forEach((post) => state.data.posts.push(post));
+        state.data.feeds.push({ ...feed, id, link: inputData });
+        posts.forEach((post) => state.data.posts.push({ ...post, id }));
       })
       .catch((error) => {
         state.form.valid = false;
@@ -122,12 +111,14 @@ export default () => {
     }
     feeds.forEach((feed) => {
       const oldPosts = posts.filter((post) => post.id === feed.id);
-      axios.get(feed.url)
+      const url = getUrl(feed.link);
+      axios.get(url)
         .then((response) => {
           const data = parse(response.data);
-          return getPreparedData(data, feed.id);
+          const newPosts = data.posts;
+          return newPosts.map((post) => ({ ...post, id: feed.id }));
         })
-        .then((preparedData) => getDiffPosts(preparedData.posts, oldPosts))
+        .then((newPosts) => getDiffPosts(newPosts, oldPosts))
         .then((diffPosts) => {
           if (diffPosts !== []) {
             diffPosts.forEach((post) => state.data.posts.unshift(post));

@@ -1,4 +1,4 @@
-const getItems = (data) => {
+const getPosts = (data) => {
   const items = data.querySelectorAll('item');
   const listPosts = [...items].map((item) => {
     const titleElement = item.querySelector('title');
@@ -13,7 +13,7 @@ const getItems = (data) => {
   return listPosts;
 };
 
-const getHeadChannel = (data) => {
+const getFeed = (data) => {
   const titleElement = data.querySelector('channel > title');
   const name = titleElement.textContent;
   const descriptionElement = data.querySelector('channel > description');
@@ -25,7 +25,7 @@ const getHeadChannel = (data) => {
 export default (data) => {
   const parser = new DOMParser();
   const docData = parser.parseFromString(data, 'text/xml');
-  const head = getHeadChannel(docData);
-  const items = getItems(docData);
-  return { head, items };
+  const feed = getFeed(docData);
+  const posts = getPosts(docData);
+  return { feed, posts };
 };
